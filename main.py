@@ -1,0 +1,34 @@
+import asyncio
+
+import argparse
+
+from captcha import TokiCaptcha
+from downloader import TokiDownloader
+
+
+async def main():
+    parser = argparse.ArgumentParser(prog="tokihunter")
+
+    parser.add_argument(
+        "--captcha",
+        action="store_true",
+        help="Open browser to solve CAPTCHA"
+    )
+
+    parser.add_argument(
+        "url",
+        type=str,
+        help="URL to download"
+    )
+
+    args = parser.parse_args()
+
+    if args.captcha:
+        await TokiCaptcha(args).run()
+        await TokiDownloader(args).run()
+
+    else:
+        await TokiDownloader(args).run()
+
+if __name__ == "__main__":
+    asyncio.run(main())
