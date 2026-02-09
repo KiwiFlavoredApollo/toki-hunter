@@ -1,11 +1,10 @@
 import asyncio
+import logging
 import re
 from pathlib import Path
 
-import logging
 import zendriver
 from websockets import ConnectionClosedError
-from zendriver.core.cloudflare import cf_is_interactive_challenge_present
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
