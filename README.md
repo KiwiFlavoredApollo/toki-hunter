@@ -1,5 +1,33 @@
 # README
 
+## Quick Start
+
+1. Download `tokihunter.exe`
+2. Open Windows Terminal 
+3. Navigate to the executable
+4. Run `tokihunter.exe --captcha`
+5. Run `tokihunter.exe https://manatoki469.net/comic/<comic-id>`
+
+## Version
+
 ```
-tokidown <url>
+tokihunter.exe --version
+```
+
+## CAPTCHA
+
+```
+tokihunter.exe --captcha
+```
+
+Opens Manatoki’s CAPTCHA page. Once it’s completed, subsequent downloads won’t require CAPTCHA verification.
+
+## Download
+
+```
+tokihunter.exe https://manatoki469.net/comic/<comic-id>
+```
+You can also run CAPTCHA verification and start the download in a single command:
+```
+tokihunter.exe --captcha https://manatoki469.net/comic/<comic-id>
 ```
