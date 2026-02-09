@@ -25,17 +25,14 @@ async def main():
     parser.add_argument(
         "url",
         type=str,
+        nargs="?",
         help="URL to download"
     )
 
     args = parser.parse_args()
 
-    if args.captcha:
-        await TokiCaptcha(args).run()
-        await TokiDownloader(args).run()
-
-    else:
-        await TokiDownloader(args).run()
+    await TokiCaptcha(args).run()
+    await TokiDownloader(args).run()
 
 if __name__ == "__main__":
     asyncio.run(main())

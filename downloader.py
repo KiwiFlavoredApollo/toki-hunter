@@ -27,6 +27,9 @@ class TokiDownloader:
         self.url = args.url
 
     async def run(self):
+        if not self.url:
+            return
+
         browser = await zendriver.start(
             headless=False
         )

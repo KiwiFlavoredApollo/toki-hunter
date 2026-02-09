@@ -10,9 +10,12 @@ class TokiCaptcha:
     PAGE_LOAD_DELAY = 1.0
 
     def __init__(self, args):
-        pass
+        self.captcha = args.captcha
 
     async def run(self):
+        if not self.captcha:
+            return
+
         browser = await zendriver.start(
             headless=False
         )
