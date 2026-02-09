@@ -1,3 +1,5 @@
 .session.dat
 
+build/
+dist/
 downloads/

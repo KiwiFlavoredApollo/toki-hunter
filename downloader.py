@@ -5,7 +5,7 @@ from pathlib import Path
 import logging
 import zendriver
 from websockets import ConnectionClosedError
-
+from zendriver.core.cloudflare import cf_is_interactive_challenge_present
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -18,6 +18,7 @@ logger.addHandler(handler)
 
 class TokiDownloader:
     MANATOKI_URL = "https://manatoki469.net/comic"
+    CAPTCHA_URL = "https://manatoki469.net/bbs/captcha.php"
     DOWNLOAD_PATH = Path.cwd() / "downloads"
     PAGE_LOAD_DELAY = 1.0
     IMAGE_DOWNLOAD_DELAY = 0.5
@@ -66,8 +67,11 @@ class TokiDownloader:
 
     async def wait_until_page_load(self, page):
         while True:
-            if self.is_browser_stopped(page.browser):
+            if self.is_browser_stopped(page):
                 break
+
+            if not self.is_captcha_passed(page):
+                continue
 
             if self.is_page_loaded(page):
                 break
@@ -76,8 +80,11 @@ class TokiDownloader:
 
         await page.wait_for_ready_state("complete")
 
-    def is_browser_stopped(self, browser):
-        return browser.stopped
+    def is_browser_stopped(self, page):
+        return page.browser.stopped
+
+    def is_captcha_passed(self, page):
+        return re.match(f"{TokiDownloader.CAPTCHA_URL}.*", page.url) is None
 
     def is_page_loaded(self, page):
         return re.match(f"{TokiDownloader.MANATOKI_URL}/\\d+", page.url) is not None

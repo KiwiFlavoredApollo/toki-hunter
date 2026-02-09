@@ -7,7 +7,7 @@ from downloader import TokiDownloader
 
 
 async def main():
-    parser = argparse.ArgumentParser(prog="tokihunter")
+    parser = argparse.ArgumentParser()
 
     parser.add_argument(
         "--captcha",

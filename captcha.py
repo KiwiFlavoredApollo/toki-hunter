@@ -25,7 +25,7 @@ class TokiCaptcha:
 
     async def wait_until_captcha_pass(self, page):
         while True:
-            if self.is_browser_stopped(page.browser):
+            if self.is_browser_stopped(page):
                 break
 
             if self.is_captcha_passed(page):
@@ -33,8 +33,8 @@ class TokiCaptcha:
 
             await asyncio.sleep(TokiCaptcha.PAGE_LOAD_DELAY)
 
-    def is_browser_stopped(self, browser):
-        return browser.stopped
+    def is_browser_stopped(self, page):
+        return page.browser.stopped
 
     def is_captcha_passed(self, page):
         return re.match(f"{TokiCaptcha.CAPTCHA_URL}.*", page.url) is None
