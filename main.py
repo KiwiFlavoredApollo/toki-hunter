@@ -5,9 +5,16 @@ import argparse
 from captcha import TokiCaptcha
 from downloader import TokiDownloader
 
+VERSION = "1.0.0"
 
 async def main():
     parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=VERSION
+    )
 
     parser.add_argument(
         "--captcha",
