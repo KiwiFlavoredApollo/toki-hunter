@@ -94,8 +94,7 @@ class TokiDownloader:
         return re.match(f"{TokiDownloader.MANATOKI_URL}/\\d+", page.url) is not None
 
     async def get_title(self, page):
-        title = await page.select('.toon-title')
-        return title.attrs['title']
+        return (await page.select('.toon-title')).attrs['title']
 
     async def get_download_path(self, title):
         return Path(TokiDownloader.DOWNLOAD_PATH / title)

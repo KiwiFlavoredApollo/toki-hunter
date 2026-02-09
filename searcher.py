@@ -96,5 +96,4 @@ class TokiSearcher:
         return await page.select_all(".list-item div a")
 
     async def get_title(self, page):
-        title = await page.select('.view-title .view-content span b')
-        return title.text.strip()
+        return (await page.select('.view-title .view-content span b')).text.strip()
