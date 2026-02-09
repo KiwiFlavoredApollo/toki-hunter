@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 zendriver = "*"
+logging = "*"
 
 [dev-packages]
 

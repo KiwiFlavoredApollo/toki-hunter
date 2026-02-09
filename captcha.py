@@ -2,7 +2,7 @@ import asyncio
 import re
 
 import zendriver
-from websockets import ConnectionClosed
+from websockets import ConnectionClosedError
 
 
 class TokiCaptcha:
@@ -21,7 +21,7 @@ class TokiCaptcha:
         await self.wait_until_captcha_pass(page)
 
         await self.save_cookies(browser)
-        await browser.stop()
+        await self.stop_browser(browser)
 
     async def wait_until_captcha_pass(self, page):
         while True:
@@ -43,5 +43,12 @@ class TokiCaptcha:
         try:
             await browser.cookies.save()
 
-        except ConnectionClosed:
+        except ConnectionClosedError:
+            pass
+
+    async def stop_browser(self, browser):
+        try:
+            await browser.stop()
+
+        except ConnectionClosedError:
             pass

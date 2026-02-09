@@ -1,11 +1,19 @@
 import asyncio
 import re
-from operator import truediv
-
 from pathlib import Path
+
+import logging
 import zendriver
-from websockets import ConnectionClosedError, ConnectionClosed
-from zendriver.core.cloudflare import cf_is_interactive_challenge_present
+from websockets import ConnectionClosedError
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+handler.setLevel(logging.INFO)
+handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+logger.addHandler(handler)
+logger.addHandler(handler)
 
 
 class TokiDownloader:
@@ -25,47 +33,41 @@ class TokiDownloader:
         await self.load_cookies(browser)
         page = await browser.get(self.url)
         await self.wait_until_page_load(page)
-        download_path = await self.get_download_path(page)
+        title = await self.get_title(page)
+        download_path = await self.get_download_path(title)
 
         if download_path.exists():
+            logger.info(f"Skipped downloading {title}.")
+            logger.warning(f"{title} already exists.")
             await self.save_cookies(browser)
-            await browser.stop()
+            await self.stop_browser(browser)
             return
 
         await page.set_download_path(download_path)
 
         for index, image in enumerate(await self.get_images(page)):
             try:
-                filename = f"{await self.get_title(page)} - {index:04d}.png"
+                filename = f"{title} - {index:04d}.png"
                 await page.download_file(self.get_image_url(image), filename)
 
             except IndexError:
                 pass
 
+            except ConnectionClosedError:
+                break
+
             await asyncio.sleep(TokiDownloader.IMAGE_DOWNLOAD_DELAY)
 
         self.remove_non_png_file(download_path)
         await self.save_cookies(browser)
-        await browser.stop()
+        await self.stop_browser(browser)
 
-    async def load_cookies(self, browser):
-        try:
-            await browser.cookies.load()
-
-        except FileNotFoundError:
-            pass
-
-    async def save_cookies(self, browser):
-        try:
-            await browser.cookies.save()
-
-        except ConnectionClosed:
-            pass
+        logger.info(f"Downloaded {title}.")
 
     async def wait_until_page_load(self, page):
         while True:
-            if await cf_is_interactive_challenge_present(page):
-                continue
+            if self.is_browser_stopped(page.browser):
+                break
 
             if self.is_page_loaded(page):
                 break
@@ -74,12 +76,17 @@ class TokiDownloader:
 
         await page.wait_for_ready_state("complete")
 
+    def is_browser_stopped(self, browser):
+        return browser.stopped
+
+    def is_page_loaded(self, page):
+        return re.match(f"{TokiDownloader.MANATOKI_URL}/\\d+", page.url) is not None
+
     async def get_title(self, page):
         title = await page.select('.toon-title')
         return title.attrs['title']
 
-    async def get_download_path(self, page):
-        title = await self.get_title(page)
+    async def get_download_path(self, title):
         return Path(TokiDownloader.DOWNLOAD_PATH / title)
 
     async def get_images(self, page):
@@ -93,5 +100,23 @@ class TokiDownloader:
             if file.is_file() and file.suffix.lower() != ".png":
                 file.unlink()
 
-    def is_page_loaded(self, page):
-        return re.match(f"{TokiDownloader.MANATOKI_URL}/\\d+", page.url) is not None
+    async def load_cookies(self, browser):
+        try:
+            await browser.cookies.load()
+
+        except FileNotFoundError:
+            pass
+
+    async def save_cookies(self, browser):
+        try:
+            await browser.cookies.save()
+
+        except ConnectionClosedError:
+            pass
+
+    async def stop_browser(self, browser):
+        try:
+            await browser.stop()
+
+        except ConnectionClosedError:
+            pass
