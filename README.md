@@ -6,7 +6,7 @@
 2. Open Windows Terminal 
 3. Navigate to the executable
 4. Run `tokihunter.exe --captcha`
-5. Run `tokihunter.exe https://manatoki469.net/comic/<comic-id>`
+5. Run `tokihunter.exe https://manatoki469.net/comic/<chapter-id>`
 
 ## Version
 
@@ -25,9 +25,17 @@ Opens Manatoki’s CAPTCHA page. Once it’s completed, subsequent downloads won
 ## Download
 
 ```
-tokihunter.exe https://manatoki469.net/comic/<comic-id>
+tokihunter.exe https://manatoki469.net/comic/<chapter-id>
 ```
 You can also run CAPTCHA verification and start the download in a single command:
 ```
-tokihunter.exe --captcha https://manatoki469.net/comic/<comic-id>
+tokihunter.exe --captcha https://manatoki469.net/comic/<chapter-id>
 ```
+
+## Search
+
+```
+tokihunter.exe --search https://manatoki469.net/comic/<title-id>
+```
+
+URLs for each chapter will be saved in `searches/<title>.txt`.

@@ -4,6 +4,7 @@ import argparse
 
 from captcha import TokiCaptcha
 from downloader import TokiDownloader
+from searcher import TokiSearcher
 
 VERSION = "1.0.0"
 
@@ -23,16 +24,23 @@ async def main():
     )
 
     parser.add_argument(
+        "--search",
+        action="store_true",
+        help="Search URLs from a title"
+    )
+
+    parser.add_argument(
         "url",
         type=str,
         nargs="?",
-        help="URL to download"
+        help="URL to download or search URLs from"
     )
 
     args = parser.parse_args()
 
     await TokiCaptcha(args).run()
     await TokiDownloader(args).run()
+    await TokiSearcher(args).run()
 
 if __name__ == "__main__":
     asyncio.run(main())

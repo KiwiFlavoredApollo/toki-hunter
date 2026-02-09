@@ -25,9 +25,13 @@ class TokiDownloader:
 
     def __init__(self, args):
         self.url = args.url
+        self.search = args.search
 
     async def run(self):
         if not self.url:
+            return
+
+        if self.search:
             return
 
         browser = await zendriver.start(
@@ -80,8 +84,6 @@ class TokiDownloader:
                 break
 
             await asyncio.sleep(TokiDownloader.PAGE_LOAD_DELAY)
-
-        await page.wait_for_ready_state("complete")
 
     def is_browser_stopped(self, page):
         return page.browser.stopped
