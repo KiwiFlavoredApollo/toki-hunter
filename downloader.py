@@ -67,9 +67,9 @@ class TokiDownloader:
 
             await asyncio.sleep(self.get_image_download_delay())
 
-        self.remove_non_png_file(download_path)
         await self.save_cookies(browser)
         await self.stop_browser(browser)
+        self.remove_non_png_file(download_path)
 
         logger.info(f"Downloaded {title}.")
 
