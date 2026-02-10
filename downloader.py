@@ -85,6 +85,8 @@ class TokiDownloader:
 
             await asyncio.sleep(TokiDownloader.PAGE_LOAD_DELAY)
 
+        await asyncio.sleep(TokiDownloader.PAGE_LOAD_DELAY)
+
     def is_browser_stopped(self, page):
         return page.browser.stopped
 
