@@ -1,17 +1,26 @@
 import asyncio
+import logging
 import re
 from pathlib import Path
 
 import zendriver
 from websockets import ConnectionClosedError
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+handler.setLevel(logging.INFO)
+handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+logger.addHandler(handler)
+logger.addHandler(handler)
+
 
 class TokiSearcher:
     MANATOKI_URL = "https://manatoki469.net/comic"
     CAPTCHA_URL = "https://manatoki469.net/bbs/captcha.php"
     SEARCH_PATH = Path.cwd() / "searches"
-    PAGE_LOAD_DELAY = 1.0
-    IMAGE_DOWNLOAD_DELAY = 0.5
+    PAGE_LOAD_DELAY = 2.0
+    IMAGE_DOWNLOAD_DELAY = 2.0
 
     def __init__(self, args):
         self.url = args.url
@@ -35,7 +44,7 @@ class TokiSearcher:
 
         urls = list()
         for url in await self.get_urls(page):
-            urls.append(re.sub("&spage=1$", "", url.attrs["href"]))
+            urls.append(self.remove_invalid_characters(url.attrs["href"]))
 
         if not TokiSearcher.SEARCH_PATH.exists():
             TokiSearcher.SEARCH_PATH.mkdir(parents=True, exist_ok=True)
@@ -49,6 +58,8 @@ class TokiSearcher:
 
         await self.save_cookies(browser)
         await self.stop_browser(browser)
+
+        logger.info(f"Searched URLs for {title}.")
 
     async def load_cookies(self, browser):
         try:
@@ -100,3 +111,6 @@ class TokiSearcher:
 
     async def get_title(self, page):
         return (await page.select('.view-title .view-content span b')).text.strip()
+
+    def remove_invalid_characters(self, url):
+        return re.sub("&spage=1$", "", url)

@@ -19,8 +19,8 @@ class TokiDownloader:
     MANATOKI_URL = "https://manatoki469.net/comic"
     CAPTCHA_URL = "https://manatoki469.net/bbs/captcha.php"
     DOWNLOAD_PATH = Path.cwd() / "downloads"
-    PAGE_LOAD_DELAY = 1.0
-    IMAGE_DOWNLOAD_DELAY = 0.5
+    PAGE_LOAD_DELAY = 2.0
+    IMAGE_DOWNLOAD_DELAY = 2.0
 
     def __init__(self, args):
         self.url = args.url
@@ -45,8 +45,8 @@ class TokiDownloader:
         download_path = await self.get_download_path(title)
 
         if download_path.exists():
-            logger.info(f"Skipped downloading {title}.")
             logger.warning(f"{title} already exists.")
+            logger.info(f"Skipped downloading {title}.")
             await self.save_cookies(browser)
             await self.stop_browser(browser)
             return
