@@ -6,7 +6,7 @@ from captcha import TokiCaptcha
 from downloader import TokiDownloader
 from searcher import TokiSearcher
 
-VERSION = "1.0.2"
+VERSION = "1.0.3"
 
 async def main():
     parser = argparse.ArgumentParser()
