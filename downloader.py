@@ -20,8 +20,8 @@ class TokiDownloader:
     MANATOKI_URL = "https://manatoki469.net/comic"
     CAPTCHA_URL = "https://manatoki469.net/bbs/captcha.php"
     DOWNLOAD_PATH = Path.cwd() / "downloads"
-    PAGE_LOAD_DELAY = 2.0
-    IMAGE_DOWNLOAD_DELAY = 5.0
+    PAGE_LOAD_DELAY = 1.0
+    IMAGE_DOWNLOAD_DELAY = 1.0
 
     def __init__(self, args):
         self.url = args.url
