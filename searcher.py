@@ -16,6 +16,7 @@ class TokiSearcher:
     def __init__(self, args):
         self.url = args.url
         self.search = args.search
+        self.headless = args.headless
 
     async def run(self):
         if not self.url:
@@ -25,7 +26,7 @@ class TokiSearcher:
             return
 
         browser = await zendriver.start(
-            headless=False
+            headless=self.headless
         )
 
         await self.load_cookies(browser)

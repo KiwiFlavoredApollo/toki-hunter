@@ -31,11 +31,17 @@ You can also run CAPTCHA verification and start the download in a single command
 ```
 tokihunter.exe --captcha https://manatoki469.net/comic/<chapter-id>
 ```
+```
+tokihunter.exe --headless https://manatoki469.net/comic/<chapter-id>
+```
 
 ## Search
 
 ```
 tokihunter.exe --search https://manatoki469.net/comic/<title-id>
+```
+```
+tokihunter.exe --search --headless https://manatoki469.net/comic/<title-id>
 ```
 
 URLs for each chapter will be saved in `searches/<title>.txt`.

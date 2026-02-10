@@ -30,6 +30,12 @@ async def main():
     )
 
     parser.add_argument(
+        "--headless",
+        action="store_true",
+        help="Run in headless mode"
+    )
+
+    parser.add_argument(
         "url",
         type=str,
         nargs="?",
