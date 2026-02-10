@@ -7,12 +7,12 @@ from pathlib import Path
 import zendriver
 from websockets import ConnectionClosedError
 
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
 handler.setLevel(logging.INFO)
 handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
-logger.addHandler(handler)
 logger.addHandler(handler)
 
 
