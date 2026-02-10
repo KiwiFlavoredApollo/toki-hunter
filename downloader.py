@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import random
 import re
 from pathlib import Path
 
@@ -20,7 +21,7 @@ class TokiDownloader:
     CAPTCHA_URL = "https://manatoki469.net/bbs/captcha.php"
     DOWNLOAD_PATH = Path.cwd() / "downloads"
     PAGE_LOAD_DELAY = 2.0
-    IMAGE_DOWNLOAD_DELAY = 2.0
+    IMAGE_DOWNLOAD_DELAY = 5.0
 
     def __init__(self, args):
         self.url = args.url
@@ -64,7 +65,7 @@ class TokiDownloader:
             except ConnectionClosedError:
                 break
 
-            await asyncio.sleep(TokiDownloader.IMAGE_DOWNLOAD_DELAY)
+            await asyncio.sleep(self.get_image_download_delay())
 
         self.remove_non_png_file(download_path)
         await self.save_cookies(browser)
@@ -103,7 +104,7 @@ class TokiDownloader:
         return Path(TokiDownloader.DOWNLOAD_PATH / title)
 
     async def get_images(self, page):
-        return await page.select_all(".view-padding div img")
+        return list(filter(lambda image: image.attributes[3] != "", await page.select_all(".view-padding div img")))
 
     def get_image_url(self, image):
         return image.attributes[3]
@@ -133,3 +134,8 @@ class TokiDownloader:
 
         except ConnectionClosedError:
             pass
+
+    def get_image_download_delay(self):
+        minimum = TokiDownloader.IMAGE_DOWNLOAD_DELAY * 0.5
+        maximum = TokiDownloader.IMAGE_DOWNLOAD_DELAY * 1.5
+        return random.uniform(minimum, maximum)
