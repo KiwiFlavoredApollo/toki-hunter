@@ -4,5 +4,6 @@ build/
 dist/
 downloads/
 searches/
+logs/
 
 .idea/
