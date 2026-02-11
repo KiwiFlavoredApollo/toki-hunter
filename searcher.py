@@ -51,7 +51,7 @@ class TokiSearcher:
         await self.wait_until_page_load(page)
 
         title = await self.get_title(page)
-        logger.info(f"Searching {title}...")
+        logger.info(f"Search started: {title}")
 
         urls = list()
         for url in await self.get_urls(page):
@@ -68,7 +68,7 @@ class TokiSearcher:
         await self.save_cookies(browser)
         await self.stop_browser(browser)
 
-        logger.info(f"Searched URLs for {title}.")
+        logger.info(f"Search completed: {title}")
 
     async def load_cookies(self, browser):
         try:

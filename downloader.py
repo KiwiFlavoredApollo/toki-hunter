@@ -55,13 +55,13 @@ class TokiDownloader:
         download_path = await self.get_download_path(title)
 
         if download_path.exists():
-            logger.warning(f"{title} already exists.")
-            logger.info(f"Skipped downloading {title}.")
+            logger.warning(f"{title} already exists")
+            logger.info(f"Download skipped: {title}")
             await self.save_cookies(browser)
             await self.stop_browser(browser)
             return
 
-        logger.info(f"Downloading {title}...")
+        logger.info(f"Download started: {title}")
 
         await page.set_download_path(download_path)
 
@@ -82,7 +82,7 @@ class TokiDownloader:
         await self.stop_browser(browser)
         self.remove_non_png_file(download_path)
 
-        logger.info(f"Downloaded {title}.")
+        logger.info(f"Download completed: {title}")
 
     async def wait_until_page_load(self, page):
         while True:
