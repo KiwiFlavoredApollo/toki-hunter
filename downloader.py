@@ -61,6 +61,8 @@ class TokiDownloader:
             await self.stop_browser(browser)
             return
 
+        logger.info(f"Downloading {title}...")
+
         await page.set_download_path(download_path)
 
         for index, image in enumerate(await self.get_images(page)):

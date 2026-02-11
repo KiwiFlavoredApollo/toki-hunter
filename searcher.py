@@ -50,6 +50,9 @@ class TokiSearcher:
         page = await browser.get(self.url)
         await self.wait_until_page_load(page)
 
+        title = await self.get_title(page)
+        logger.info(f"Searching {title}...")
+
         urls = list()
         for url in await self.get_urls(page):
             urls.append(self.remove_invalid_characters(url.attrs["href"]))
@@ -57,9 +60,7 @@ class TokiSearcher:
         if not TokiSearcher.SEARCH_PATH.exists():
             TokiSearcher.SEARCH_PATH.mkdir(parents=True, exist_ok=True)
 
-        title = await self.get_title(page)
         search_path = Path(TokiSearcher.SEARCH_PATH / f"{title}.txt")
-
         with open(search_path, "w", encoding="utf-8") as f:
             for url in urls:
                 f.write(url + "\n")
