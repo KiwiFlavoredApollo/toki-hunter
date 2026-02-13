@@ -50,25 +50,42 @@ class TokiDownloader:
 
         await self.load_cookies(browser)
         page = await browser.get(self.url)
-        await self.wait_until_page_load(page)
-        title = await self.get_title(page)
-        download_path = await self.get_download_path(title)
 
-        if download_path.exists():
-            logger.warning(f"{title} already exists")
-            logger.info(f"Download skipped: {title}")
+        await self.wait_until_page_load(page)
+
+        chapter = await self.get_chapter(page)
+
+        if self.is_already_downloaded(chapter):
+            logger.warning(f"{chapter} is already downloaded")
+
             await self.save_cookies(browser)
             await self.stop_browser(browser)
-            return
 
-        logger.info(f"Download started: {title}")
+            logger.info(f"Download skipped: {chapter}")
 
-        await page.set_download_path(download_path)
+        else:
+            logger.info(f"Download started: {chapter}")
+
+            await self.download_image_files(page, chapter)
+
+            await self.save_cookies(browser)
+            await self.stop_browser(browser)
+
+            self.remove_non_image_files(chapter)
+
+            logger.info(f"Download completed: {chapter}")
+
+    def is_already_downloaded(self, chapter):
+        return self.get_download_path(chapter).exists()
+
+    async def download_image_files(self, page, chapter):
+        await page.set_download_path(self.get_download_path(chapter))
 
         for index, image in enumerate(await self.get_images(page)):
             try:
-                filename = f"{title} - {index:04d}.png"
-                await page.download_file(self.get_image_url(image), filename)
+                url = self.get_image_url(image)
+                filename = self.get_filename(chapter, index)
+                await page.download_file(url, filename)
 
             except IndexError:
                 pass
@@ -77,12 +94,6 @@ class TokiDownloader:
                 break
 
             await asyncio.sleep(self.get_image_download_delay())
-
-        await self.save_cookies(browser)
-        await self.stop_browser(browser)
-        self.remove_non_png_file(download_path)
-
-        logger.info(f"Download completed: {title}")
 
     async def wait_until_page_load(self, page):
         while True:
@@ -108,11 +119,11 @@ class TokiDownloader:
     def is_page_loaded(self, page):
         return re.match(f"{TokiDownloader.MANATOKI_URL}/\\d+", page.url) is not None
 
-    async def get_title(self, page):
+    async def get_chapter(self, page):
         return (await page.select('.toon-title')).attrs['title']
 
-    async def get_download_path(self, title):
-        return Path(TokiDownloader.DOWNLOAD_PATH / title)
+    def get_download_path(self, chapter):
+        return Path(TokiDownloader.DOWNLOAD_PATH / chapter)
 
     async def get_images(self, page):
         return list(filter(lambda image: image.attributes[3] != "", await page.select_all(".view-padding div img")))
@@ -120,10 +131,16 @@ class TokiDownloader:
     def get_image_url(self, image):
         return image.attributes[3]
 
-    def remove_non_png_file(self, download_path):
-        for file in download_path.iterdir():
-            if file.is_file() and file.suffix.lower() != ".png":
+    def get_filename(self, chapter, index):
+        return f"{chapter} - {index:04d}.png"
+
+    def remove_non_image_files(self, chapter):
+        for file in self.get_download_path(chapter).iterdir():
+            if not self.is_image_file(file):
                 file.unlink()
+
+    def is_image_file(self, file):
+        return file.is_file() and file.suffix.lower() == ".png"
 
     async def load_cookies(self, browser):
         try:

@@ -6,13 +6,11 @@ import tkinter
 from tkinter import Tk, ttk, StringVar, BooleanVar
 from tkinter.scrolledtext import ScrolledText
 
+import captcha
 import downloader
 import main
 from captcha import TokiCaptcha
 from downloader import TokiDownloader
-
-
-logger = downloader.logger
 
 
 class Gui:
@@ -50,7 +48,12 @@ class Gui:
         self.url_entry.bind("<FocusIn>", self.clear_url_placeholder)
         self.url_entry.bind("<FocusOut>", self.restore_url_placeholder)
 
-        logger.addHandler(TextHandler(self.log_entry))
+        self.log_entry.tag_config("error", foreground="red")
+        self.log_entry.tag_config("warning", foreground="orange")
+        self.log_entry.tag_config("info", foreground="black")
+
+        captcha.logger.addHandler(TextHandler(self.log_entry))
+        downloader.logger.addHandler(TextHandler(self.log_entry))
 
     def run(self):
         self.root.mainloop()
@@ -66,25 +69,31 @@ class Gui:
         threading.Thread(target=self.download_internal, daemon=True).start()
 
     def captcha_internal(self):
-        args = argparse.Namespace(
-            captcha=True
-        )
+        try:
+            args = argparse.Namespace(
+                captcha=True
+            )
 
-        asyncio.run(TokiCaptcha(args).run())
-        self.captcha_button.config(state="normal")
-        self.download_button.config(state="normal")
+            asyncio.run(TokiCaptcha(args).run())
+
+        finally:
+            self.captcha_button.config(state="normal")
+            self.download_button.config(state="normal")
 
     def download_internal(self):
-        args = argparse.Namespace(
-            captcha=False,
-            search=False,
-            headless=self.headless.get(),
-            url=self.url.get(),
-        )
+        try:
+            args = argparse.Namespace(
+                captcha=False,
+                search=False,
+                headless=self.headless.get(),
+                url=self.url.get(),
+            )
 
-        asyncio.run(TokiDownloader(args).run())
-        self.captcha_button.config(state="normal")
-        self.download_button.config(state="normal")
+            asyncio.run(TokiDownloader(args).run())
+
+        finally:
+            self.captcha_button.config(state="normal")
+            self.download_button.config(state="normal")
 
     def get_screen_center_x(self, tk):
         screen_width = tk.winfo_screenwidth()
@@ -114,14 +123,25 @@ class TextHandler(logging.Handler):
         self.text_widget = text_widget
 
     def emit(self, record):
+        append = self.append
         message = self.format(record)
-        self.text_widget.after(0, self.append, message)
+        tag = self.get_tag(record)
 
-    def append(self, message):
+        self.text_widget.after(0, append, message, tag)
+
+    def append(self, message, tag):
         self.text_widget.config(state="normal")
-        self.text_widget.insert(tkinter.END, message + "\n")
+        self.text_widget.insert(tkinter.END, message + "\n", tag)
         self.text_widget.config(state="disabled")
         self.text_widget.see(tkinter.END)
+
+    def get_tag(self, record: logging.LogRecord):
+        if record.levelno >= logging.ERROR:
+            return "error"
+        elif record.levelno >= logging.WARNING:
+            return "warning"
+        else:
+            return "info"
 
 
 if __name__ == "__main__":
