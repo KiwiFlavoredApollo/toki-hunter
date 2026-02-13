@@ -1,5 +1,9 @@
 # README
 
+## GUI
+
+![screenshot](resources/screenshot.png)
+
 ## Quick Start
 
 1. Download `tokihunter.exe`
