@@ -7,6 +7,7 @@ from tkinter import Tk, ttk, StringVar, BooleanVar
 from tkinter.scrolledtext import ScrolledText
 
 import downloader
+import main
 from captcha import TokiCaptcha
 from downloader import TokiDownloader
 
@@ -30,7 +31,7 @@ class Gui:
         self.download_button = ttk.Button(self.frame, text="Download", command=self.download)
         self.log_entry = ScrolledText(self.frame, width=50, state="disabled")
 
-        self.root.title("TokiHunter")
+        self.root.title(f"TokiHunter {main.VERSION}")
         self.root.resizable(False, False)
         self.frame.grid()
 
